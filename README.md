@@ -8,15 +8,16 @@ PHP RUtils
 [![License](https://poser.pugx.org/andre_487/php_rutils/license)](https://packagist.org/packages/andre_487/php_rutils)
 [![Latest Stable Version](https://poser.pugx.org/andre_487/php_rutils/v/stable)](https://packagist.org/packages/andre_487/php_rutils)
 
-[![Build Status](https://travis-ci.org/Andre-487/php_rutils.svg)](https://travis-ci.org/Andre-487/php_rutils)
-[![Code Climate](https://codeclimate.com/github/Andre-487/php_rutils/badges/gpa.svg)](https://codeclimate.com/github/Andre-487/php_rutils)
+[![Build Status](https://github.com/helios-ag/php_rutils/actions/workflows/tests.yml/badge.svg)](https://github.com/helios-ag/php_rutils/actions/workflows/tests.yml)
 
 RUtils is a Russian-specific string utils (transliteration, numeral is words, russian dates, typography) for PHP.
 This is a port of the Python [Pytils](https://github.com/j2a/pytils) to PHP.
 
-See additional docs and examples in [doc subdir](https://github.com/Andre-487/php_rutils/tree/master/doc).
+See additional docs and examples in [doc subdir](https://github.com/helios-ag/php_rutils/tree/main/doc).
 
 Library is published on the Composer: https://packagist.org/packages/andre_487/php_rutils
+
+Requires PHP 8.3+.
 
 ----------
 
@@ -24,7 +25,7 @@ RUtils — утилиты для работы c текстом на русско
 простая типографика) для языка PHP.
 RUtils — порт утилит [Pytils](https://github.com/j2a/pytils) на PHP.
 
-Документацию и примеры смотрите в [каталоге doc](https://github.com/Andre-487/php_rutils/tree/master/doc).
+Документацию и примеры смотрите в [каталоге doc](https://github.com/helios-ag/php_rutils/tree/main/doc).
 
 Библиотека доступна через Composer: https://packagist.org/packages/andre_487/php_rutils
 
@@ -36,11 +37,20 @@ RUtils — порт утилит [Pytils](https://github.com/j2a/pytils) на PH
 
 Буду рад принять помощь по проекту в виде советов, баг-репортов и pull-реквестов.
 
-Проект следует стилю кодирования [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md).
-Стиль проверяется с помощью [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer)
-на этапе CI.
+Проект использует PSR-4 autoloading, [PHP CS Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) и [Psalm](https://psalm.dev/).
+Проверка стиля и статический анализ запускаются в CI и доступны локально через `Makefile`.
 
-Хочу сказать большое спасибо [всем людям](https://github.com/Andre-487/php_rutils/graphs/contributors),
+### Development
+
+- Local dev environment: `docker compose up -d` or `make up`
+- Shell in container: `make shell`
+- Tests: `make test`
+- Fix code style: `make cs-fix`
+- Static analysis: `make psalm`
+- VS Code / OpenCode devcontainer: `.devcontainer/devcontainer.json`
+- Doc examples in `doc/examples/` run standalone.
+
+Хочу сказать большое спасибо [всем людям](https://github.com/helios-ag/php_rutils/graphs/contributors),
 внесшим свой вклад в улучшение проекта.
 
 ----------
@@ -59,11 +69,11 @@ Modules of PHP RUtils:
 
 Choosing the word form depending of a number:
 ```php
-$variants = array(
+$variants = [
     'гвоздь', //1
     'гвоздя', //2
     'гвоздей' //5
-);
+];
 echo $amount, ' ', RUtils::numeral()->choosePlural(15, $variants);
 //Result: 15 гвоздей
 
@@ -113,12 +123,12 @@ echo RUtils::dt()->ruStrFTime($params);
 
 Historical date:
 ```php
-$params = array(
+$params = [
     'date' => '09-05-1945',
     'format' => 'l d F Y была одержана победа над немецко-фашистскими захватчиками',
     'monthInflected' => true,
     'preposition' => true,
-);
+];
 echo RUtils::dt()->ruStrFTime($params);
 //Result: в среду 9 мая 1945 была одержана победа над немецко-фашистскими захватчиками
 ```
@@ -195,7 +205,7 @@ echo RUtils::typo()->typography($text, TypoRules::$EXTENDED_RULES);
  */
 
 //Custom rules
-echo RUtils::typo()->typography($text, array(TypoRules::DASHES, TypoRules::CLEAN_SPACES));
+echo RUtils::typo()->typography($text, [TypoRules::DASHES, TypoRules::CLEAN_SPACES]);
 /**
  * Result:
  * ...Когда В. И. Пупкин увидел в газете (это была "Сермяжная правда" № 45) рубрику Weather Forecast (r),
