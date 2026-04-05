@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="5"
+    resolveFromConfigFile="true"
+    findUnusedCode="true"
+    findUnusedBaselineEntry="true"
+    findUnusedPsalmSuppress="true"
+>
+    <projectFiles>
+        <directory name="src" />
+    </projectFiles>
+
+    <issueHandlers>
+        <MissingParamType errorLevel="info" />
+        <MissingReturnType errorLevel="info" />
+        <MixedArgument errorLevel="info" />
+        <MixedAssignment errorLevel="info" />
+        <MixedArrayAccess errorLevel="info" />
+        <MixedMethodCall errorLevel="info" />
+        <MixedPropertyAssignment errorLevel="info" />
+        <MixedPropertyFetch errorLevel="info" />
+        <MixedReturnStatement errorLevel="info" />
+        <PossiblyUndefinedArrayOffset errorLevel="info" />
+        <PossiblyUnusedMethod errorLevel="suppress" />
+        <PossiblyUnusedParam errorLevel="suppress" />
+    </issueHandlers>
+</psalm>

@@ -1,0 +1,9 @@
+{
+  "name": "php_rutils",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/php_rutils",
+  "overrideCommand": false,
+  "remoteUser": "dev",
+  "postCreateCommand": "composer install --no-interaction --prefer-dist"
+}

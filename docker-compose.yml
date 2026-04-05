@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    working_dir: /workspaces/php_rutils
+    volumes:
+      - .:/workspaces/php_rutils:cached
+    environment:
+      COMPOSER_CACHE_DIR: /tmp/composer-cache
+    tty: true
+    stdin_open: true
+    command: sleep infinity
