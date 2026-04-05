@@ -1,12 +1,10 @@
 PHP RUtils
 ----------
 
-## Больше не поддерживается
-
 ## Summary
 
-[![License](https://poser.pugx.org/andre_487/php_rutils/license)](https://packagist.org/packages/andre_487/php_rutils)
-[![Latest Stable Version](https://poser.pugx.org/andre_487/php_rutils/v/stable)](https://packagist.org/packages/andre_487/php_rutils)
+[![License](https://poser.pugx.org/helios-ag/php_rutils/license)](https://packagist.org/packages/helios-ag/php_rutils)
+[![Latest Stable Version](https://poser.pugx.org/helios-ag/php_rutils/v/stable)](https://packagist.org/packages/helios-ag/php_rutils)
 
 [![Build Status](https://github.com/helios-ag/php_rutils/actions/workflows/tests.yml/badge.svg)](https://github.com/helios-ag/php_rutils/actions/workflows/tests.yml)
 
@@ -15,7 +13,7 @@ This is a port of the Python [Pytils](https://github.com/j2a/pytils) to PHP.
 
 See additional docs and examples in [doc subdir](https://github.com/helios-ag/php_rutils/tree/main/doc).
 
-Library is published on the Composer: https://packagist.org/packages/andre_487/php_rutils
+Library is published on the Composer: https://packagist.org/packages/helios-ag/php_rutils
 
 Requires PHP 8.3+.
 
@@ -27,11 +25,11 @@ RUtils — порт утилит [Pytils](https://github.com/j2a/pytils) на PH
 
 Документацию и примеры смотрите в [каталоге doc](https://github.com/helios-ag/php_rutils/tree/main/doc).
 
-Библиотека доступна через Composer: https://packagist.org/packages/andre_487/php_rutils
+Библиотека доступна через Composer: https://packagist.org/packages/helios-ag/php_rutils
 
-[![Daily Downloads](https://poser.pugx.org/andre_487/php_rutils/d/daily)](https://packagist.org/packages/andre_487/php_rutils)
-[![Monthly Downloads](https://poser.pugx.org/andre_487/php_rutils/d/monthly)](https://packagist.org/packages/andre_487/php_rutils)
-[![Total Downloads](https://poser.pugx.org/andre_487/php_rutils/downloads)](https://packagist.org/packages/andre_487/php_rutils)
+[![Daily Downloads](https://poser.pugx.org/helios-ag/php_rutils/d/daily)](https://packagist.org/packages/helios-ag/php_rutils)
+[![Monthly Downloads](https://poser.pugx.org/helios-ag/php_rutils/d/monthly)](https://packagist.org/packages/helios-ag/php_rutils)
+[![Total Downloads](https://poser.pugx.org/helios-ag/php_rutils/downloads)](https://packagist.org/packages/helios-ag/php_rutils)
 
 ----------
 
