@@ -1,5 +1,5 @@
 {
-  "name": "andre_487/php_rutils",
+  "name": "helios-ag/php_rutils",
   "description": "RUtils is a Russian-specific string utils (transliteration, numeral is words, russian dates, typography)",
   "type": "library",
   "keywords": ["transliteration", "numeral is words", "russian dates", "typography"],
