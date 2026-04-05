@@ -1,16 +1,22 @@
 <?php
-namespace php_rutils\doc\examples;
 
 use php_rutils\RUtils;
 
-require '_begin.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+define('CLI', php_sapi_name() === 'cli');
+mb_internal_encoding('UTF-8');
+
+if (!CLI) {
+    header('Content-type: text/plain; charset=UTF-8');
+}
 
 //Word forms
-$variants = array(
+$variants = [
     'гвоздь', //1
     'гвоздя', //2
     'гвоздей' //5
-);
+];
 
 //Choose plural (variant only)
 $amount = 15;
@@ -44,5 +50,3 @@ echo $numeral->getInWords(100.0), PHP_EOL;
 //Get string for money (RUB)
 echo RUtils::numeral()->getRubles(100.25), PHP_EOL;
 //Result: сто рублей двадцать пять копеек
-
-require '_end.php';

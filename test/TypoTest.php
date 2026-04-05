@@ -1,19 +1,19 @@
 <?php
+
 namespace php_rutils\test;
 
 use php_rutils\RUtils;
 use php_rutils\TypoRules;
 
-class TypoTest extends \PHPUnit_Framework_TestCase
+class TypoTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \php_rutils\Typo
      */
     private $_object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
         $this->_object = RUtils::typo();
     }
 
@@ -22,16 +22,16 @@ class TypoTest extends \PHPUnit_Framework_TestCase
      */
     public function testRlCleanSpaces()
     {
-        $testData = array(
-            " Точка ,точка , запятая, вышла рожица  кривая . "
-            => "Точка, точка, запятая, вышла рожица кривая.",
+        $testData = [
+            ' Точка ,точка , запятая, вышла рожица  кривая . '
+            => 'Точка, точка, запятая, вышла рожица кривая.',
             " Точка ,точка , \nзапятая,\n вышла  рожица \n кривая . "
             => "Точка, точка,\nзапятая,\nвышла рожица\nкривая.",
-            "Газета ( ее принес мальчишка утром ) всё еще лежала на столе."
-            => "Газета (ее принес мальчишка утром) всё еще лежала на столе.",
+            'Газета ( ее принес мальчишка утром ) всё еще лежала на столе.'
+            => 'Газета (ее принес мальчишка утром) всё еще лежала на столе.',
             "Газета, утром принесенная мальчишкой (\r это был сосед, подзарабатывающий летом\n )\r\n , всё еще лежала на столе."
-            => "Газета, утром принесенная мальчишкой (это был сосед, подзарабатывающий летом), всё еще лежала на столе."
-        );
+            => 'Газета, утром принесенная мальчишкой (это был сосед, подзарабатывающий летом), всё еще лежала на столе.'
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->rlCleanSpaces($testValue));
         }
@@ -42,11 +42,11 @@ class TypoTest extends \PHPUnit_Framework_TestCase
      */
     public function testRlCleanEllipsis()
     {
-        $testData = array(
+        $testData = [
             'Мдя..... могло быть лучше' => 'Мдя..... могло быть лучше',
             '...Дааааа' => '…Дааааа',
             '... Дааааа' => '…Дааааа'
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->rlEllipsis($testValue));
         }
@@ -57,7 +57,7 @@ class TypoTest extends \PHPUnit_Framework_TestCase
      */
     public function testRlInitials()
     {
-        $testData = array(
+        $testData = [
             'Председатель В.И.Иванов выступил на собрании'
             => "Председатель В.\xE2\x80\x89И.\xE2\x80\x89Иванов выступил на собрании",
             'Председатель В.И. Иванов выступил на собрании'
@@ -66,7 +66,7 @@ class TypoTest extends \PHPUnit_Framework_TestCase
             => "1. В.\xE2\x80\x89И.\xE2\x80\x89Иванов\r\n2. С.\xE2\x80\x89П.\xE2\x80\x89Васечкин",
             "Председатель В.\r\nИ.\r\nИванов выступил на собрании"
             => "Председатель В.\xE2\x80\x89И.\xE2\x80\x89Иванов выступил на собрании",
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->rlInitials($testValue));
         }
@@ -77,7 +77,7 @@ class TypoTest extends \PHPUnit_Framework_TestCase
      */
     public function testRlDashes()
     {
-        $testData = array(
+        $testData = [
             "- Я пошел домой...\n- Может останешься? - Нет, ухожу."
             => "—\xE2\x80\x89Я пошел домой...\n—\xE2\x80\x89Может останешься? —\xE2\x80\x89Нет, ухожу.",
             '-- Я пошел домой... -- Может останешься? -- Нет, ухожу.'
@@ -89,7 +89,7 @@ class TypoTest extends \PHPUnit_Framework_TestCase
             'Ползать по-пластунски' => 'Ползать по-пластунски',
             'Диапазон: 9 -  15' => 'Диапазон: 9—15',
             'Температура: -1 - +2' => 'Температура: -1…+2'
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->rlDashes($testValue));
         }
@@ -100,13 +100,13 @@ class TypoTest extends \PHPUnit_Framework_TestCase
      */
     public function testRlWordGlue()
     {
-        $testData = array(
+        $testData = [
             'Вроде бы оператор согласен' => "Вроде\xC2\xA0бы\xC2\xA0оператор согласен",
             'Он не поверил глазам' => "Он\xC2\xA0не\xC2\xA0поверил глазам",
             'Муха — это маленькая птичка' => "Муха\xE2\x80\x89— это\xC2\xA0маленькая птичка",
             'увидел в газете (это была "Сермяжная правда" № 45) рубрику Weather Forecast'
             => "увидел в\xC2\xA0газете (это\xC2\xA0была \"Сермяжная правда\" № 45) рубрику Weather Forecast"
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->rlWordGlue($testValue));
         }
@@ -117,17 +117,17 @@ class TypoTest extends \PHPUnit_Framework_TestCase
      */
     public function testRlMarks()
     {
-        $testData = array(
+        $testData = [
             'Когда В. И. Пупкин увидел в газете рубрику Weather Forecast (r), он не поверил своим глазам - температуру обещали +-451F.'
             => "Когда В. И. Пупкин увидел в газете рубрику Weather Forecast®, он не поверил своим глазам - температуру обещали ±451\xE2\x80\x89°F.",
             '14 Foo' => '14 Foo',
             'Coca-cola(tm)' => 'Coca-cola™',
             "(c)  2008\xE2\x80\x89Юрий Юревич" => "©\xE2\x80\x892008\xE2\x80\x89Юрий Юревич",
-            "Microsoft (R) Windows (tm)" => "Microsoft® Windows™",
-            "Школа-гимназия No 3" => "Школа-гимназия\xC2\xA0№\xE2\x80\x893",
+            'Microsoft (R) Windows (tm)' => 'Microsoft® Windows™',
+            'Школа-гимназия No 3' => "Школа-гимназия\xC2\xA0№\xE2\x80\x893",
             'Школа-гимназия No3' => "Школа-гимназия\xC2\xA0№\xE2\x80\x893",
             'Школа-гимназия №3' => "Школа-гимназия\xC2\xA0№\xE2\x80\x893",
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->rlMarks($testValue));
         }
@@ -138,15 +138,15 @@ class TypoTest extends \PHPUnit_Framework_TestCase
      */
     public function testRlQuotes()
     {
-        $testData = array(
+        $testData = [
             'ООО "МСК "Аско-Забота"' => 'ООО «МСК «Аско-Забота»',
             "\"МСК\xC2\xA0\"Аско-Забота\"" => "«МСК\xC2\xA0«Аско-Забота»",
-            "Двигатели 'Pratt&Whitney'" => "Двигатели “Pratt&Whitney”",
-            "\"Вложенные \"кавычки\" - бич всех типографик\", не правда ли"
-            => "«Вложенные «кавычки» - бич всех типографик», не правда ли",
+            "Двигатели 'Pratt&Whitney'" => 'Двигатели “Pratt&Whitney”',
+            '"Вложенные "кавычки" - бич всех типографик", не правда ли'
+            => '«Вложенные «кавычки» - бич всех типографик», не правда ли',
             "'Pratt&Whitney' никогда не использовались на самолетах \"Аэрофлота\""
-            => "“Pratt&Whitney” никогда не использовались на самолетах «Аэрофлота»"
-        );
+            => '“Pratt&Whitney” никогда не использовались на самолетах «Аэрофлота»'
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->rlQuotes($testValue));
         }

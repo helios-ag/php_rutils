@@ -1,10 +1,11 @@
 <?php
+
 namespace php_rutils\test;
 
 use php_rutils\RUtils;
 use php_rutils\struct\TimeParams;
 
-class DtTest extends \PHPUnit_Framework_TestCase
+class DtTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \php_rutils\Dt
@@ -21,15 +22,14 @@ class DtTest extends \PHPUnit_Framework_TestCase
      */
     private $_defaultParams;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
         $this->_object = RUtils::dt();
         $this->_date = '1988-01-01 6:40:34';
-        $this->_defaultParams = array(
+        $this->_defaultParams = [
             'date' => $this->_date,
             'timezone' => 'UTC',
-        );
+        ];
     }
 
     /**
@@ -37,7 +37,7 @@ class DtTest extends \PHPUnit_Framework_TestCase
      */
     public function testRuStrFTimeFixed()
     {
-        $testData = array(
+        $testData = [
             'd.m.Y' => '01.01.1988',
             'тест D' => 'тест пт',
             'тест l' => 'тест пятница',
@@ -45,7 +45,7 @@ class DtTest extends \PHPUnit_Framework_TestCase
             'тест F' => 'тест январь',
             'd M Y' => '1 янв 1988',
             'd F Y' => '1 январь 1988',
-        );
+        ];
 
         $params = $this->_defaultParams;
         foreach ($testData as $format => $expected) {
@@ -60,10 +60,10 @@ class DtTest extends \PHPUnit_Framework_TestCase
      */
     public function testRuStrFTimePreposition()
     {
-        $testData = array(
+        $testData = [
             'тест D' => "тест в\xC2\xA0пт",
             'тест l' => "тест в\xC2\xA0пятницу",
-        );
+        ];
 
         $params = $this->_defaultParams;
         $params['preposition'] = true;
@@ -80,15 +80,15 @@ class DtTest extends \PHPUnit_Framework_TestCase
      */
     public function testRuStrFTimeInflected()
     {
-        $testData = array(
-            'тест M' => "тест янв",
-            'тест F' => "тест января",
-            'd M Y' => "1 янв 1988",
-            'd F Y' => "1 января 1988",
+        $testData = [
+            'тест M' => 'тест янв',
+            'тест F' => 'тест января',
+            'd M Y' => '1 янв 1988',
+            'd F Y' => '1 января 1988',
             'тест выполнен d F Y года' => 'тест выполнен 1 января 1988 года',
-            'тестируем D' => "тестируем пт",
-            'тестируем l' => "тестируем пятницу",
-        );
+            'тестируем D' => 'тестируем пт',
+            'тестируем l' => 'тестируем пятницу',
+        ];
 
         $params = $this->_defaultParams;
         $params['preposition'] = false;

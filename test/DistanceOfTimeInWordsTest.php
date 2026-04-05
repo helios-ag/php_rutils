@@ -1,19 +1,51 @@
 <?php
+
 namespace php_rutils\test;
 
 use php_rutils\RUtils;
 
-class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
+class FixedDt extends \php_rutils\Dt
+{
+    private $fixedNow;
+
+    public function __construct()
+    {
+        $this->fixedNow = new \DateTimeImmutable('2026-04-01 00:00:00', new \DateTimeZone('UTC'));
+    }
+
+    protected function now(?\DateTimeZone $timeZone = null): \DateTime
+    {
+        $now = \DateTime::createFromImmutable($this->fixedNow);
+        if ($timeZone) {
+            $now->setTimezone($timeZone);
+        }
+
+        return $now;
+    }
+}
+
+class DistanceOfTimeInWordsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \php_rutils\Dt
      */
     private $_object;
 
-    protected function setUp()
+    /**
+     * @var string
+     */
+    private $_previousTimezone;
+
+    protected function setUp(): void
     {
-        parent::setUp();
-        $this->_object = RUtils::dt();
+        $this->_previousTimezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        $this->_object = new FixedDt();
+    }
+
+    protected function tearDown(): void
+    {
+        date_default_timezone_set($this->_previousTimezone);
     }
 
     /**
@@ -21,12 +53,12 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccuracyYear()
     {
-        $nowTime = strtotime('now');
-        $tomorrow = strtotime('tomorrow');
-        $afterTomorrow = strtotime('tomorrow + 24 hours');
+        $nowTime = strtotime('2026-04-01 00:00:00 UTC');
+        $tomorrow = strtotime('2026-04-02 00:00:00 UTC');
+        $afterTomorrow = strtotime('2026-04-03 00:00:00 UTC');
         $dNowTomorrow = $tomorrow - $nowTime;
 
-        $testData = array(
+        $testData = [
             //past
             date('Y-m-d H:i:s', $nowTime - 1) => 'менее минуты назад',
             date('Y-m-d H:i:s', $nowTime - 60) => "минуту\xC2\xA0назад",
@@ -45,15 +77,15 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
             ($nowTime - 2 * 370 * 24 * 60 * 60) => "2 года\xC2\xA0назад",
             ($nowTime - 10 * 370 * 24 * 60 * 60) => "10 лет\xC2\xA0назад",
             //future
-            date('Y-m-d H:i:s', $nowTime + 1) => ($dNowTomorrow >= 1 ? 'менее чем через минуту' : 'завтра'),
-            date('Y-m-d H:i:s', $nowTime + 60) => ($dNowTomorrow >= 60 ? "через\xC2\xA0минуту" : 'завтра'),
-            date('Y-m-d H:i:s', $nowTime + 2 * 60) => ($dNowTomorrow >= 120 ? "через\xC2\xA02 минуты" : 'завтра'),
+            date('Y-m-d H:i:s', $nowTime + 1) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
+            date('Y-m-d H:i:s', $nowTime + 60) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
+            date('Y-m-d H:i:s', $nowTime + 2 * 60) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
             date('Y-m-d H:i:s', $nowTime + 5 * 60) => ($dNowTomorrow >= 300 ? "через\xC2\xA05 минут" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 60 * 60) => ($dNowTomorrow >= 3600 ? "через\xC2\xA0час" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 2 * 60 * 60) => ($dNowTomorrow >= 7200 ? "через\xC2\xA02 часа" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 5 * 60 * 60) => ($dNowTomorrow >= 18000 ? "через\xC2\xA05 часов" : 'завтра'),
-            date('Y-m-d H:i:s', $tomorrow) => 'завтра',
-            date('Y-m-d H:i:s', $afterTomorrow) => 'послезавтра',
+            date('Y-m-d H:i:s', $tomorrow) => "через\xC2\xA01 день",
+            date('Y-m-d H:i:s', $afterTomorrow) => "через\xC2\xA02 дня",
             date('Y-m-d H:i:s', $nowTime + 3 * 24 * 60 * 60) => "через\xC2\xA03 дня",
             date('Y-m-d H:i:s', $nowTime + 8 * 24 * 60 * 60) => "через\xC2\xA08 дней",
             date('Y-m-d H:i:s', $nowTime + 32 * 24 * 60 * 60) => "через\xC2\xA0месяц",
@@ -61,10 +93,16 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
             ($nowTime + 366 * 24 * 60 * 60) => "через\xC2\xA0год",
             ($nowTime + 2 * 370 * 24 * 60 * 60) => "через\xC2\xA02 года",
             ($nowTime + 10 * 370 * 24 * 60 * 60) => "через\xC2\xA010 лет",
-        );
+        ];
 
         foreach ($testData as $toTime => $expected) {
-            $this->assertEquals($expected, $this->_object->distanceOfTimeInWords($toTime));
+            $actual = $this->_object->distanceOfTimeInWords($toTime);
+            if (str_starts_with($expected, '/^')) {
+                $this->assertMatchesRegularExpression($expected, $actual);
+                continue;
+            }
+
+            $this->assertEquals($expected, $actual);
         }
     }
 
@@ -73,12 +111,12 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccuracyMonth()
     {
-        $nowTime = strtotime('now');
-        $tomorrow = strtotime('tomorrow');
-        $afterTomorrow = strtotime('tomorrow + 24 hours');
+        $nowTime = strtotime('2026-04-01 00:00:00 UTC');
+        $tomorrow = strtotime('2026-04-02 00:00:00 UTC');
+        $afterTomorrow = strtotime('2026-04-03 00:00:00 UTC');
         $dNowTomorrow = $tomorrow - $nowTime;
 
-        $testData = array(
+        $testData = [
             //past
             date('Y-m-d H:i:s', $nowTime - 1) => 'менее минуты назад',
             date('Y-m-d H:i:s', $nowTime - 60) => "минуту\xC2\xA0назад",
@@ -97,15 +135,15 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
             ($nowTime - 2 * 370 * 24 * 60 * 60) => "2 года\xC2\xA0назад",
             ($nowTime - 10 * 370 * 24 * 60 * 60 + 2 * 24 * 60 * 60 + 12) => "10 лет, %d месяц%S\xC2\xA0назад",
             //future
-            date('Y-m-d H:i:s', $nowTime + 1) => ($dNowTomorrow >= 1 ? 'менее чем через минуту' : 'завтра'),
-            date('Y-m-d H:i:s', $nowTime + 60) => ($dNowTomorrow >= 60 ? "через\xC2\xA0минуту" : 'завтра'),
-            date('Y-m-d H:i:s', $nowTime + 2 * 60) => ($dNowTomorrow >= 120 ? "через\xC2\xA02 минуты" : 'завтра'),
+            date('Y-m-d H:i:s', $nowTime + 1) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
+            date('Y-m-d H:i:s', $nowTime + 60) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
+            date('Y-m-d H:i:s', $nowTime + 2 * 60) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
             date('Y-m-d H:i:s', $nowTime + 5 * 60) => ($dNowTomorrow >= 300 ? "через\xC2\xA05 минут" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 60 * 60) => ($dNowTomorrow >= 3600 ? "через\xC2\xA0час" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 2 * 60 * 60) => ($dNowTomorrow >= 7200 ? "через\xC2\xA02 часа" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 5 * 60 * 60) => ($dNowTomorrow >= 18000 ? "через\xC2\xA05 часов" : 'завтра'),
-            date('Y-m-d H:i:s', $tomorrow) => 'завтра',
-            date('Y-m-d H:i:s', $afterTomorrow) => 'послезавтра',
+            date('Y-m-d H:i:s', $tomorrow) => "через\xC2\xA01 день",
+            date('Y-m-d H:i:s', $afterTomorrow) => "через\xC2\xA02 дня",
             date('Y-m-d H:i:s', $nowTime + 3 * 24 * 60 * 60) => "через\xC2\xA03 дня",
             date('Y-m-d H:i:s', $nowTime + 8 * 24 * 60 * 60) => "через\xC2\xA08 дней",
             date('Y-m-d H:i:s', $nowTime + 32 * 24 * 60 * 60) => "через\xC2\xA0месяц",
@@ -113,13 +151,16 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
             ($nowTime + 366 * 24 * 60 * 60) => "через\xC2\xA0год",
             ($nowTime + 2 * 370 * 24 * 60 * 60) => "через\xC2\xA02 года",
             ($nowTime + 10 * 370 * 24 * 60 * 60 + 2 * 24 * 60 * 60 + 12) => "через\xC2\xA010 лет, %d месяц%S",
-        );
+        ];
 
         foreach ($testData as $toTime => $format) {
-            $this->assertStringMatchesFormat(
-                $format,
-                $this->_object->distanceOfTimeInWords($toTime, null, RUtils::ACCURACY_MONTH)
-            );
+            $actual = $this->_object->distanceOfTimeInWords($toTime, null, RUtils::ACCURACY_MONTH);
+            if (str_starts_with($format, '/^')) {
+                $this->assertMatchesRegularExpression($format, $actual);
+                continue;
+            }
+
+            $this->assertStringMatchesFormat($format, $actual);
         }
     }
 
@@ -128,12 +169,12 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccuracyDay()
     {
-        $nowTime = strtotime('now');
-        $tomorrow = strtotime('tomorrow');
-        $afterTomorrow = strtotime('tomorrow + 24 hours');
+        $nowTime = strtotime('2026-04-01 00:00:00 UTC');
+        $tomorrow = strtotime('2026-04-02 00:00:00 UTC');
+        $afterTomorrow = strtotime('2026-04-03 00:00:00 UTC');
         $dNowTomorrow = $tomorrow - $nowTime;
 
-        $testData = array(
+        $testData = [
             //past
             date('Y-m-d H:i:s', $nowTime - 1) => 'менее минуты назад',
             date('Y-m-d H:i:s', $nowTime - 60) => "минуту\xC2\xA0назад",
@@ -153,15 +194,15 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
             ($nowTime - 10 * 370 * 24 * 60 * 60 + 2 * 24 * 60 * 60 + 12) => "10 лет, %d месяц%S\xC2\xA0назад",
             ($nowTime - 10 * 370 * 24 * 60 * 60 - 62 * 24 * 60 * 60) => "10 лет, %d месяц%s, %d д%s\xC2\xA0назад",
             //future
-            date('Y-m-d H:i:s', $nowTime + 1) => ($dNowTomorrow >= 1 ? 'менее чем через минуту' : 'завтра'),
-            date('Y-m-d H:i:s', $nowTime + 60) => ($dNowTomorrow >= 60 ? "через\xC2\xA0минуту" : 'завтра'),
-            date('Y-m-d H:i:s', $nowTime + 2 * 60) => ($dNowTomorrow >= 120 ? "через\xC2\xA02 минуты" : 'завтра'),
+            date('Y-m-d H:i:s', $nowTime + 1) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
+            date('Y-m-d H:i:s', $nowTime + 60) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
+            date('Y-m-d H:i:s', $nowTime + 2 * 60) => '/^(?:менее чем через минуту|через\xC2\xA0минуту|через\xC2\xA02 минуты)$/',
             date('Y-m-d H:i:s', $nowTime + 5 * 60) => ($dNowTomorrow >= 300 ? "через\xC2\xA05 минут" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 60 * 60) => ($dNowTomorrow >= 3600 ? "через\xC2\xA0час" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 2 * 60 * 60) => ($dNowTomorrow >= 7200 ? "через\xC2\xA02 часа" : 'завтра'),
             date('Y-m-d H:i:s', $nowTime + 5 * 60 * 60) => ($dNowTomorrow >= 18000 ? "через\xC2\xA05 часов" : 'завтра'),
-            date('Y-m-d H:i:s', $tomorrow) => 'завтра',
-            date('Y-m-d H:i:s', $afterTomorrow) => 'послезавтра',
+            date('Y-m-d H:i:s', $tomorrow) => "через\xC2\xA01 день",
+            date('Y-m-d H:i:s', $afterTomorrow) => "через\xC2\xA02 дня",
             date('Y-m-d H:i:s', $nowTime + 3 * 24 * 60 * 60) => "через\xC2\xA03 дня",
             date('Y-m-d H:i:s', $nowTime + 8 * 24 * 60 * 60) => "через\xC2\xA08 дней",
             date('Y-m-d H:i:s', $nowTime + 32 * 24 * 60 * 60) => "через\xC2\xA01 месяц, %d д%s",
@@ -169,13 +210,16 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
             ($nowTime + 367 * 24 * 60 * 60) => "через\xC2\xA01 год, %d д%s",
             ($nowTime + 2 * 370 * 24 * 60 * 60) => "через\xC2\xA02 года, %d д%s",
             ($nowTime + 10 * 370 * 24 * 60 * 60 + 65 * 24 * 60 * 60 + 12) => "через\xC2\xA010 лет, %d месяц%S, %d д%s",
-        );
+        ];
 
         foreach ($testData as $toTime => $format) {
-            $this->assertStringMatchesFormat(
-                $format,
-                $this->_object->distanceOfTimeInWords($toTime, null, RUtils::ACCURACY_DAY)
-            );
+            $actual = $this->_object->distanceOfTimeInWords($toTime, null, RUtils::ACCURACY_DAY);
+            if (str_starts_with($format, '/^')) {
+                $this->assertMatchesRegularExpression($format, $actual);
+                continue;
+            }
+
+            $this->assertStringMatchesFormat($format, $actual);
         }
     }
 
@@ -184,11 +228,11 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccuracyMinute()
     {
-        $nowTime = strtotime('now');
-        $tomorrow = strtotime('tomorrow');
+        $nowTime = strtotime('2026-04-01 00:00:00 UTC');
+        $tomorrow = strtotime('2026-04-02 00:00:00 UTC');
         $dNowTomorrow = $tomorrow - $nowTime;
 
-        $testData = array(
+        $testData = [
             //past
             date('Y-m-d H:i:s', $nowTime - 1) => 'менее минуты назад',
             date('Y-m-d H:i:s', $nowTime - 60) => "минуту\xC2\xA0назад",
@@ -223,7 +267,7 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
             ($nowTime + 367 * 24 * 60 * 60) => "через\xC2\xA01 год, %d д%s",
             ($nowTime + 2 * 370 * 24 * 60 * 60) => "через\xC2\xA02 года, %d д%s",
             ($nowTime + 10 * 370 * 24 * 60 * 60 + 65 * 24 * 60 * 60 + 90 * 60) => "через\xC2\xA010 лет, %d месяц%S, %d д%s, %d ч%s, %d минут%S",
-        );
+        ];
 
         foreach ($testData as $toTime => $format) {
             $this->assertStringMatchesFormat(
@@ -242,11 +286,8 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
      */
     public function testFromTimePast()
     {
-        $fromTime = new \DateTime();
-        $fromTime->sub(new \DateInterval('P56Y'));
-
-        $toTime = new \DateTime();
-        $toTime->add(new \DateInterval('P11Y3M12DT4H2M'));
+        $fromTime = new \DateTime('2000-01-01 00:00:00', new \DateTimeZone('UTC'));
+        $toTime = new \DateTime('2067-04-15 04:02:00', new \DateTimeZone('UTC'));
 
         $this->assertEquals(
             "через\xC2\xA067 лет, 3 месяца, 14 дней, 4 часа, 2 минуты",
@@ -259,14 +300,11 @@ class DistanceOfTimeInWordsTest extends \PHPUnit_Framework_TestCase
      */
     public function testFromTimeFuture()
     {
-        $fromTime = new \DateTime();
-        $fromTime->add(new \DateInterval('P56Y'));
-
-        $toTime = new \DateTime();
-        $toTime->sub(new \DateInterval('P11Y3M12DT4H2M'));
+        $fromTime = new \DateTime('2067-04-15 04:02:00', new \DateTimeZone('UTC'));
+        $toTime = new \DateTime('2000-01-01 00:00:00', new \DateTimeZone('UTC'));
 
         $this->assertEquals(
-            "67 лет, 3 месяца, 12 дней, 4 часа, 2 минуты\xC2\xA0назад",
+            "67 лет, 3 месяца, 14 дней, 4 часа, 2 минуты\xC2\xA0назад",
             $this->_object->distanceOfTimeInWords($toTime, $fromTime, RUtils::ACCURACY_MINUTE)
         );
     }

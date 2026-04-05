@@ -1,4 +1,5 @@
 <?php
+
 namespace php_rutils\struct;
 
 class TimeParams
@@ -6,52 +7,42 @@ class TimeParams
     /**
      * Date format, use PHP date() function specification:
      * http://www.php.net/manual/en/function.date.php
-     * @var string
      */
-    public $format = 'd.m.Y';
+    public string $format = 'd.m.Y';
 
     /**
      * Date value, default=null translates to 'now'.
      * For string values use matched PHP rules:
      * http://www.php.net/manual/en/datetime.formats.php
      * Int value as Unix timestamp
-     * @var string|int|\DateTime
      */
-    public $date = null;
+    public int|string|\DateTime|null $date = null;
 
     /**
      * Timezone value, default=null translates to default PHP timezone.
      * For string values use matched PHP rules:
      * http://www.php.net/manual/en/timezones.php
-     * @var string|\DateTimeZone|null
      */
-    public $timezone = null;
+    public string|\DateTimeZone|null $timezone = null;
 
     /**
      * Is month inflected (января, февраля), default false
-     * @var bool
      */
-    public $monthInflected = false;
+    public bool $monthInflected = false;
 
     /**
      * Is day inflected (среду, пятницу) default false
-     * @var bool
      */
-    public $dayInflected = false;
+    public bool $dayInflected = false;
 
     /**
      * Is preposition used (во вторник), default false
      * $preposition=true automatically implies $dayInflected=true
-     * @var bool
      */
-    public $preposition = false;
+    public bool $preposition = false;
 
-    /**
-     * Create params from array or with default values
-     * @param array|null $aParams
-     * @return TimeParams
-     */
-    public static function create(array $aParams = null)
+    /** Create params from array or with default values */
+    public static function create(?array $aParams = null): self
     {
         $params = new self();
         if ($aParams === null) {
@@ -65,7 +56,7 @@ class TimeParams
         return $params;
     }
 
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): never
     {
         throw new \InvalidArgumentException("Wrong parameter name: $name");
     }

@@ -1,18 +1,18 @@
 <?php
+
 namespace php_rutils\test;
 
 use php_rutils\RUtils;
 
-class TranslitTest extends \PHPUnit_Framework_TestCase
+class TranslitTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \php_rutils\Translit
      */
     private $_object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
         $this->_object = RUtils::translit();
     }
 
@@ -21,7 +21,7 @@ class TranslitTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslify()
     {
-        $testData = array(
+        $testData = [
             'тест №1' => 'test #1',
             'проверка' => 'proverka',
             'транслит' => 'translit',
@@ -30,7 +30,7 @@ class TranslitTest extends \PHPUnit_Framework_TestCase
             '«Вот так вот»' => '"Vot tak vot"',
             '‘Или вот так’' => "'Ili vot tak'",
             'Двигатель “Pratt&Whitney”' => 'Dvigatel` "Pratt&Whitney"'
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->translify($testValue));
         }
@@ -41,7 +41,7 @@ class TranslitTest extends \PHPUnit_Framework_TestCase
      */
     public function testDetranslify()
     {
-        $testData = array(
+        $testData = [
             'test #1' => 'тест №1',
             'proverka' => 'проверка',
             'translit' => 'транслит',
@@ -49,7 +49,7 @@ class TranslitTest extends \PHPUnit_Framework_TestCase
             'Shhuka' => 'Щука',
             '"Vot tak vot"' => '«Вот так вот»',
             "'Ili vot tak'" => '‘Или вот так’',
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->detranslify($testValue));
         }
@@ -60,7 +60,7 @@ class TranslitTest extends \PHPUnit_Framework_TestCase
      */
     public function testSlugify()
     {
-        $testData = array(
+        $testData = [
             'тест' => 'test',
             'Проверка связи' => 'proverka-svyazi',
             'me&you' => 'me-and-you',
@@ -72,7 +72,7 @@ class TranslitTest extends \PHPUnit_Framework_TestCase
             'Юнит-тесты — наше всё' => 'yunit-testy-nashe-vsyo',
             '95−34' => '95-34',
             'Эмгыр вар Эмрейс тоже хочет быть в slugify' => 'emgyr-var-emrejs-tozhe-xochet-byt-v-slugify',
-        );
+        ];
         foreach ($testData as $testValue => $expected) {
             $this->assertEquals($expected, $this->_object->slugify($testValue));
         }
@@ -84,7 +84,7 @@ class TranslitTest extends \PHPUnit_Framework_TestCase
      */
     public function testUniqueness()
     {
-        $originalText = file_get_contents(__DIR__.'/data/zarathustra.txt');
+        $originalText = file_get_contents(__DIR__ . '/data/zarathustra.txt');
 
         $translitText = $this->_object->translify($originalText);
         $cyrText = $this->_object->detranslify($translitText);
