@@ -1,11 +1,17 @@
 <?php
-namespace php_rutils\doc\examples;
 
 use php_rutils\Dt;
 use php_rutils\RUtils;
 use php_rutils\struct\TimeParams;
 
-require '_begin.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+define('CLI', php_sapi_name() === 'cli');
+mb_internal_encoding('UTF-8');
+
+if (!CLI) {
+    header('Content-type: text/plain; charset=UTF-8');
+}
 
 //Now date, params as TimeParams class instance
 $params = new TimeParams();
@@ -18,12 +24,12 @@ echo RUtils::dt()->ruStrFTime($params), PHP_EOL;
 
 //Historical date, params as array (fields same as in the TimeParams object),
 //date as string (Unix timestamp and \DateTime instance also available)
-$params = array(
+$params = [
     'date' => '09-05-1945',
     'format' => 'l d F Y была одержана победа над немецко-фашистскими захватчиками',
     'monthInflected' => true,
     'preposition' => true,
-);
+];
 echo RUtils::dt()->ruStrFTime($params), PHP_EOL;
 //Result: в среду 9 мая 1945 была одержана победа над немецко-фашистскими захватчиками
 
@@ -61,6 +67,3 @@ $toTime = '2088-01-01 12:35';
 $accuracy = RUtils::ACCURACY_MINUTE; //years, months, days, hours, minutes
 echo RUtils::dt()->distanceOfTimeInWords($toTime, $fromTime, $accuracy), PHP_EOL;
 //Result: опосля 100 лет, 55 минут
-
-
-require '_end.php';
